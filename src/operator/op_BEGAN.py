@@ -63,6 +63,7 @@ class Operator(op_base):
             tf.summary.scalar('loss/d_fake_loss', self.d_fake_loss)
             tf.summary.scalar('misc/kt', self.kt)
             tf.summary.scalar('misc/m_global', self.m_global)
+            tf.summary.scalar('misc/lr', self.lr)
             self.merged = tf.summary.merge_all()
             self.writer = tf.summary.FileWriter(self.project_dir, self.sess.graph)
 
@@ -121,10 +122,12 @@ class Operator(op_base):
 
                 # Test during Training
                 if self.count % self.niter_snapshot == (self.niter_snapshot - 1):
-                    # update learning rate
-                    lr *= 0.95
                     # save & test
                     self.saver.save(self.sess, self.ckpt_model_name, global_step=self.count, write_meta_graph=False)
+                if self.count % 50000 == 0:
+                    # update learning rate
+                    lr *= 0.1 # 0.95
+                if self.count % 5 == 0:
                     self.test(train_flag)
 
     def test(self, train_flag=True):
